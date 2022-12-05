@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.androidcrdigitallessons'
+    namespace 'com.example.premierleaguefixtures'
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.androidcrdigitallessons"
+        applicationId "com.example.premierleaguefixtures"
         minSdk 21
         targetSdk 32
         versionCode 1

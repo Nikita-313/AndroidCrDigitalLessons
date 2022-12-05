@@ -1,4 +1,4 @@
-package com.example.androidcrdigitallessons
+package com.example.premierleaguefixtures
 
 import org.junit.Test
 
