@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">PremierLeagueFixtures</string>
+    <string name="fragment_1">Фрагмент 1</string>
+    <string name="fragment_2">Фрагмент 2</string>
 </resources>
