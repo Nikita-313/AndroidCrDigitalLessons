@@ -1,12 +1,17 @@
 package com.example.premierleaguefixtures.screens
 
+import androidx.lifecycle.viewmodel.compose.viewModel
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,14 +21,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.premierleaguefixtures.MainScreenViewModel
 import com.example.premierleaguefixtures.R
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val matchesState by viewModel.getMatches().collectAsState()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -38,14 +48,36 @@ fun MainScreen() {
                 .fillMaxWidth()
                 .padding(top = it.calculateTopPadding())
         ) {
-            items(10) { i -> InfoCard(i,"2:10 08/10/2022","GWS Giants","Adelaide Crows",1,1); }
+
+            items(matchesState.size) { i ->
+                InfoCard(
+                    matchesState[i].matchNumber,
+                    matchesState[i].dateUtc,
+                    matchesState[i].homeTeam,
+                    matchesState[i].awayTeam,
+                    matchesState[i].homeTeamScore,
+                    matchesState[i].awayTeamScore
+                )
+            }
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun InfoCard(index: Int,dateTime : String, homeTeam: String, awayTeam: String, homeTeamScore:Int?, awayTeamScore:Int?) {
+fun InfoCard(
+    index: Int,
+    dateTime: String,
+    homeTeam: String,
+    awayTeam: String,
+    homeTeamScore: Int?,
+    awayTeamScore: Int?
+) {
     val cardColor = if (index % 2 == 0) Color(0xFFF7F8FA) else Color.White
+    val pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssz")
+    val zonedDateTime = ZonedDateTime.parse(dateTime, pattern)
+    val date = zonedDateTime.format(DateTimeFormatter.ofPattern("dd.MM")).toString()
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = cardColor),
@@ -54,7 +86,7 @@ fun InfoCard(index: Int,dateTime : String, homeTeam: String, awayTeam: String, h
         Box {
             Text(
                 modifier = Modifier.padding(8.dp),
-                text = dateTime,
+                text = date,
                 color = Color(0xFF897995),
                 fontSize = 12.sp
             )
@@ -92,7 +124,7 @@ fun InfoCard(index: Int,dateTime : String, homeTeam: String, awayTeam: String, h
                             modifier = Modifier
                                 .size(25.dp)
                         )
-                        if(homeTeamScore == null || awayTeamScore == null) Text(text = "×")
+                        if (homeTeamScore == null || awayTeamScore == null) Text(text = "×")
                         else Text(text = "$homeTeamScore:$awayTeamScore")
                         Image(
                             painter = painterResource(id = R.drawable.ball),
