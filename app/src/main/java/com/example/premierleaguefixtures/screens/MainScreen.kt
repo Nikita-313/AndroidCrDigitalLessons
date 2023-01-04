@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,11 +39,26 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
-                title = { Text(text = "Matches") },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "Matches 2021")
+                        Box(Modifier.width(10.dp))
+                        if (matchesState.isEmpty()) {
+                            Text(text = "loading")
+                            Box(Modifier.width(10.dp))
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(size = 28.dp),
+                                strokeWidth = 2.dp
+                            )
+                        }
+                    }
+
+                },
                 scrollBehavior = scrollBehavior
             )
         },
     ) {
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,7 +67,7 @@ fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
 
             items(matchesState.size) { i ->
                 InfoCard(
-                    matchesState[i].matchNumber,
+                    i,
                     matchesState[i].dateUtc,
                     matchesState[i].homeTeam,
                     matchesState[i].awayTeam,
@@ -103,7 +119,11 @@ fun InfoCard(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
                     ) {
-                        Text(text = homeTeam)
+                        Text(
+                            text = homeTeam,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     }
 
                 }
@@ -140,7 +160,11 @@ fun InfoCard(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start,
                     ) {
-                        Text(text = awayTeam)
+                        Text(
+                            text = awayTeam,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
 
