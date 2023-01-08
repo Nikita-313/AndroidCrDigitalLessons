@@ -1,6 +1,6 @@
-package com.example.premierleaguefixtures.network
+package com.example.premierleaguefixtures.data.network
 
-import com.example.premierleaguefixtures.models.Match
+import com.example.premierleaguefixtures.data.model.Match
 import retrofit2.Response
 import retrofit2.http.GET
 

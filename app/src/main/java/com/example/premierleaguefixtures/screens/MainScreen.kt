@@ -8,10 +8,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,43 +29,67 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val matchesState by viewModel.getMatches().collectAsState()
+    val isFetchingData by viewModel.getIsFetchingData().collectAsState()
+    var isShowSearch by remember { mutableStateOf(false) }
+    val searchEditText by viewModel.searchEditText.collectAsState()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "Matches 2021")
-                        Box(Modifier.width(10.dp))
-                        if (matchesState.isEmpty()) {
-                            Text(text = "loading")
-                            Box(Modifier.width(10.dp))
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(size = 28.dp),
-                                strokeWidth = 2.dp
-                            )
+            Column {
+                TopAppBar(
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "Matches 2021")
+                            Box(Modifier.width(5.dp))
+                            if (isFetchingData) {
+                                Text(text = "Fetching...")
+                            }
                         }
-                    }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = viewModel::fetchServerData,
+                            enabled = !isFetchingData
+                        ) {
+                            Icon(Icons.Filled.Refresh, null)
+                        }
+                        IconButton(
+                            onClick = {
+                                isShowSearch = !isShowSearch
+                                viewModel.setSearchEditText("")
+                            },
+                            enabled = !isFetchingData
+                        ) {
+                            Icon(Icons.Filled.Search, null)
+                        }
+                    },
+                    scrollBehavior = scrollBehavior
+                )
+                if (isFetchingData) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                if (isShowSearch)
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = { Icon(Icons.Filled.Search, null) },
+                        value = searchEditText,
+                        onValueChange = viewModel::setSearchEditText,
+                        label = { Text(text = "Team name") }
+                    )
+            }
 
-                },
-                scrollBehavior = scrollBehavior
-            )
         },
     ) {
-
         LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(top = it.calculateTopPadding())
         ) {
-
             items(matchesState.size) { i ->
                 InfoCard(
                     i,
