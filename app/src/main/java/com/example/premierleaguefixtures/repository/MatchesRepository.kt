@@ -1,6 +1,6 @@
 package com.example.premierleaguefixtures.repository
 
-import com.example.premierleaguefixtures.models.Match
+import com.example.premierleaguefixtures.data.model.Match
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

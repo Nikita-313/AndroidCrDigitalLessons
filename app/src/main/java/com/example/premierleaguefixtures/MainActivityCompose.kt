@@ -8,14 +8,15 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
+import com.example.premierleaguefixtures.data.MatchDatabase
 import com.example.premierleaguefixtures.screens.MainScreen
-import com.example.premierleaguefixtures.screens.MatchDetailsScreen.MatchDetailsScreen
 import com.example.premierleaguefixtures.ui.theme.PremierLeagueFixturesTheme
 
 class MainActivityCompose : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MatchDatabase.createDatabase(this)
         setContent {
             PremierLeagueFixturesTheme {
                 Surface(
