@@ -101,7 +101,8 @@ fun MainScreen( viewModel: MainScreenViewModel = hiltViewModel(),  navController
                     matchesState[i].awayTeam,
                     matchesState[i].homeTeamScore,
                     matchesState[i].awayTeamScore,
-                    navController = navController
+                    navController = navController,
+                    isFetchingData
                 )
             }
         }
@@ -119,7 +120,8 @@ fun InfoCard(
     awayTeam: String,
     homeTeamScore: Int?,
     awayTeamScore: Int?,
-    navController: NavController
+    navController: NavController,
+    isFetchingData: Boolean,
 ) {
     val cardColor = if (index % 2 == 0) Color(0xFFF7F8FA) else Color.White
     val pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssz")
@@ -131,6 +133,7 @@ fun InfoCard(
         colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(0.dp),
         onClick = {
+            if (!isFetchingData)
             navController.navigate("details/$matchNumber")
         }
     ) {
