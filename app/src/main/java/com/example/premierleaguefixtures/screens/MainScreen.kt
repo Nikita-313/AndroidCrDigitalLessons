@@ -1,6 +1,6 @@
 package com.example.premierleaguefixtures.screens
 
-import androidx.lifecycle.viewmodel.compose.viewModel
+
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.premierleaguefixtures.MainScreenViewModel
 import com.example.premierleaguefixtures.R
 import java.time.ZonedDateTime
@@ -33,7 +34,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun MainScreen(viewModel: MainScreenViewModel = viewModel()) {
+fun MainScreen( viewModel: MainScreenViewModel = hiltViewModel()) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val matchesState by viewModel.getMatches().collectAsState()
     val isFetchingData by viewModel.getIsFetchingData().collectAsState()

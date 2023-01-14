@@ -11,7 +11,9 @@ import androidx.compose.ui.Modifier
 import com.example.premierleaguefixtures.data.MatchDatabase
 import com.example.premierleaguefixtures.screens.MainScreen
 import com.example.premierleaguefixtures.ui.theme.PremierLeagueFixturesTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivityCompose : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {

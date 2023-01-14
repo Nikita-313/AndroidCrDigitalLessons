@@ -5,7 +5,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 
-interface APIForMatches {
+interface MatchesService {
     @GET("epl-2021")
     suspend fun matches(): Response<List<Match>>
 }
