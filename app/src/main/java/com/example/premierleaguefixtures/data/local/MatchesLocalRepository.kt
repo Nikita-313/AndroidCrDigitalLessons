@@ -23,4 +23,11 @@ class MatchesLocalRepository @Inject constructor(
                 emit(list.map { it.toMatch() })
             }
     }
+
+    fun getMatchByNumber(number: Int) = flow {
+        database?.matchDao()?.getMatchesByNumber(number)
+            ?.collect { it ->
+                emit(it.toMatch())
+            }
+    }
 }

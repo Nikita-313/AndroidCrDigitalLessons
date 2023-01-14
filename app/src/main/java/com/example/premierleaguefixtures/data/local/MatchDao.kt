@@ -19,6 +19,9 @@ interface MatchDao {
     @Query("SELECT * FROM $MATCH_TABLE WHERE homeTeam LIKE '%' || :teamName ||'%' or awayTeam LIKE '%' || :teamName ||'%'")
     fun getMatchesByTeamName(teamName:String): Flow<List<MatchEntity>>
 
+    @Query("SELECT * FROM $MATCH_TABLE WHERE matchNumber = :number")
+    fun getMatchesByNumber(number:Int): Flow<MatchEntity>
+
     companion object{
         const val MATCH_TABLE = "match_table"
     }

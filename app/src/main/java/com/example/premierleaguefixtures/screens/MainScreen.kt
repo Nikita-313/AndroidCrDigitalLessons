@@ -24,6 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.premierleaguefixtures.MainScreenViewModel
 import com.example.premierleaguefixtures.R
 import java.time.ZonedDateTime
@@ -32,9 +34,8 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun MainScreen( viewModel: MainScreenViewModel = hiltViewModel()) {
+fun MainScreen( viewModel: MainScreenViewModel = hiltViewModel(),  navController: NavController) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val matchesState by viewModel.getMatches().collectAsState()
     val isFetchingData by viewModel.getIsFetchingData().collectAsState()
@@ -94,26 +95,31 @@ fun MainScreen( viewModel: MainScreenViewModel = hiltViewModel()) {
             items(matchesState.size) { i ->
                 InfoCard(
                     i,
+                    matchesState[i].matchNumber,
                     matchesState[i].dateUtc,
                     matchesState[i].homeTeam,
                     matchesState[i].awayTeam,
                     matchesState[i].homeTeamScore,
-                    matchesState[i].awayTeamScore
+                    matchesState[i].awayTeamScore,
+                    navController = navController
                 )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun InfoCard(
     index: Int,
+    matchNumber:Int,
     dateTime: String,
     homeTeam: String,
     awayTeam: String,
     homeTeamScore: Int?,
-    awayTeamScore: Int?
+    awayTeamScore: Int?,
+    navController: NavController
 ) {
     val cardColor = if (index % 2 == 0) Color(0xFFF7F8FA) else Color.White
     val pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssz")
@@ -123,7 +129,10 @@ fun InfoCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        shape = RoundedCornerShape(0.dp)
+        shape = RoundedCornerShape(0.dp),
+        onClick = {
+            navController.navigate("details/$matchNumber")
+        }
     ) {
         Box {
             Text(
