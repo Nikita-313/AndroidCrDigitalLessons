@@ -1,11 +1,9 @@
-package com.example.premierleaguefixtures.data
+package com.example.premierleaguefixtures.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.premierleaguefixtures.data.local.MatchDao
-import com.example.premierleaguefixtures.data.local.MatchEntity
 
 @Database(entities = [MatchEntity::class], version = 1)
 abstract class MatchDatabase : RoomDatabase() {

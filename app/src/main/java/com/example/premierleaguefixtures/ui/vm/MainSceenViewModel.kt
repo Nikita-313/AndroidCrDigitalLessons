@@ -1,10 +1,11 @@
-package com.example.premierleaguefixtures
+package com.example.premierleaguefixtures.ui.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.premierleaguefixtures.data.local.MatchesLocalRepository
-import com.example.premierleaguefixtures.data.model.Match
-import com.example.premierleaguefixtures.data.network.MatchesNetworkRepository
+import com.example.premierleaguefixtures.domain.models.FootballMatch
+import com.example.premierleaguefixtures.domain.usecase.GetSavedMatchesUseCase
+import com.example.premierleaguefixtures.domain.usecase.LoadMatchesUseCase
+import com.example.premierleaguefixtures.domain.usecase.SearchMatchesByTeamNameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,11 +17,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val matchesNR: MatchesNetworkRepository,
-    private val matchesLR: MatchesLocalRepository,
+    private val loadMatchesUseCase: LoadMatchesUseCase,
+    private val getSavedMatchesUseCase: GetSavedMatchesUseCase,
+    private val searchMatchesByTeamNameUseCase: SearchMatchesByTeamNameUseCase
 ) : ViewModel() {
 
-    private val _matches = MutableStateFlow(emptyList<Match>())
+    private val _matches = MutableStateFlow(emptyList<FootballMatch>())
     private val _isFetchingData = MutableStateFlow(true)
     private val _searchEditText = MutableStateFlow("")
     val searchEditText = _searchEditText.asStateFlow()
@@ -30,7 +32,7 @@ class MainScreenViewModel @Inject constructor(
         searchMatchesByTeamName(searchEditText)
     }
 
-    fun getMatches(): StateFlow<List<Match>> = _matches
+    fun getMatches(): StateFlow<List<FootballMatch>> = _matches
     fun getIsFetchingData(): StateFlow<Boolean> = _isFetchingData
 
     init {
@@ -40,7 +42,7 @@ class MainScreenViewModel @Inject constructor(
 
     private fun getLocalData() {
         viewModelScope.launch(Dispatchers.IO) {
-            matchesLR.getMatches().collect {
+            getSavedMatchesUseCase.execute().collect{
                 _matches.emit(it)
             }
         }
@@ -49,17 +51,16 @@ class MainScreenViewModel @Inject constructor(
     fun fetchServerData() {
         viewModelScope.launch(Dispatchers.IO) {
             _isFetchingData.emit(true)
-            matchesNR.getMatches().collect {
-                _matches.emit(it)
-                _isFetchingData.emit(false)
-            }
+            val list = loadMatchesUseCase.execute();
+            if(list.isNotEmpty())
+            _matches.emit(list)
             _isFetchingData.emit(false)
         }
     }
 
     private fun searchMatchesByTeamName(teamName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            matchesLR.searchMatchesByTeamName(teamName).collect {
+            searchMatchesByTeamNameUseCase.execute(teamName).collect{
                 _matches.emit(it)
             }
         }

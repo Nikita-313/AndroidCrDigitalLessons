@@ -1,4 +1,4 @@
-package com.example.premierleaguefixtures.screens
+package com.example.premierleaguefixtures.ui.screens
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -21,24 +21,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.premierleaguefixtures.DetailsScreenViewModel
-import com.example.premierleaguefixtures.MainScreenViewModel
+import com.example.premierleaguefixtures.ui.vm.DetailsScreenViewModel
 import com.example.premierleaguefixtures.R
-import com.example.premierleaguefixtures.data.model.Match
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import com.example.premierleaguefixtures.domain.models.FootballMatch
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MatchDetailsScreen(matchNumber: Int?,viewModel: DetailsScreenViewModel = hiltViewModel(), navController: NavController) {
+fun MatchDetailsScreen(matchNumber: Int?, viewModel: DetailsScreenViewModel = hiltViewModel(), navController: NavController) {
     if (matchNumber != null) {
         viewModel.getMatchByNumber(matchNumber)
     }
@@ -84,7 +80,7 @@ fun MatchDetailsScreen(matchNumber: Int?,viewModel: DetailsScreenViewModel = hil
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TopBar(matchState:Match?) {
+fun TopBar(matchState:FootballMatch?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

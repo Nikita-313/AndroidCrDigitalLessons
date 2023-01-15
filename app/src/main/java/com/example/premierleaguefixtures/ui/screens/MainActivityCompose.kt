@@ -1,4 +1,4 @@
-package com.example.premierleaguefixtures
+package com.example.premierleaguefixtures.ui.screens
 
 import android.os.Build
 import android.os.Bundle
@@ -13,9 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.premierleaguefixtures.data.MatchDatabase
-import com.example.premierleaguefixtures.screens.MainScreen
-import com.example.premierleaguefixtures.screens.MatchDetailsScreen
+import com.example.premierleaguefixtures.data.local.MatchDatabase
 import com.example.premierleaguefixtures.ui.theme.PremierLeagueFixturesTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,7 +31,7 @@ class MainActivityCompose : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "main"){
-                        composable("main"){MainScreen(navController = navController)}
+                        composable("main"){ MainScreen(navController = navController) }
                         composable(route = "details/{matchNumber}",
                         arguments = listOf(
                             navArgument("matchNumber"){

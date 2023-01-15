@@ -1,30 +1,28 @@
-package com.example.premierleaguefixtures
+package com.example.premierleaguefixtures.ui.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.premierleaguefixtures.data.local.MatchesLocalRepository
-import com.example.premierleaguefixtures.data.model.Match
-import com.example.premierleaguefixtures.data.network.MatchesNetworkRepository
+import com.example.premierleaguefixtures.domain.models.FootballMatch
+import com.example.premierleaguefixtures.domain.usecase.GetMatchByNumberUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
 class DetailsScreenViewModel @Inject constructor(
-    private val matchesLR: MatchesLocalRepository,
+    private val getMatchByNumberUseCase: GetMatchByNumberUseCase
 ) : ViewModel() {
 
-    private val _match = MutableStateFlow<Match?>(null)
-    fun getMatch(): StateFlow<Match?> = _match
+    private val _match = MutableStateFlow<FootballMatch?>(null)
+    fun getMatch(): StateFlow<FootballMatch?> = _match
 
     fun getMatchByNumber(number: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            matchesLR.getMatchByNumber(number).collect {
+            getMatchByNumberUseCase.execute(number).collect{
                 _match.emit(it)
             }
         }

@@ -1,4 +1,4 @@
-package com.example.premierleaguefixtures.screens
+package com.example.premierleaguefixtures.ui.screens
 
 
 import android.annotation.SuppressLint
@@ -20,13 +20,11 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.premierleaguefixtures.MainScreenViewModel
+import com.example.premierleaguefixtures.ui.vm.MainScreenViewModel
 import com.example.premierleaguefixtures.R
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -35,7 +33,7 @@ import java.time.format.DateTimeFormatter
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen( viewModel: MainScreenViewModel = hiltViewModel(),  navController: NavController) {
+fun MainScreen(viewModel: MainScreenViewModel = hiltViewModel(), navController: NavController) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val matchesState by viewModel.getMatches().collectAsState()
     val isFetchingData by viewModel.getIsFetchingData().collectAsState()
