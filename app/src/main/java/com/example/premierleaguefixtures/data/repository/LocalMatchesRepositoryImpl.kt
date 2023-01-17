@@ -7,38 +7,27 @@ import com.example.premierleaguefixtures.domain.models.FootballMatch
 import com.example.premierleaguefixtures.domain.repository.LocalMatchesRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 class LocalMatchesRepositoryImpl @Inject constructor(
     private val database: MatchDatabase?
 ) : LocalMatchesRepository {
 
-    override suspend fun getMatches(): Flow<List<FootballMatch>> {
-        return flow {
-            database?.matchDao()?.getAll()?.collect { list ->
-                emit(list.map { it.toFootballMatch() })
-            }
-        }
+    override fun getMatches(): Flow<List<FootballMatch>> {
+        return database?.matchDao()?.getAll()?.map { list -> list.map { it.toFootballMatch() } }!!
     }
 
     override fun searchMatchesByTeamName(teamName: String): Flow<List<FootballMatch>> {
-        return flow {
-            database?.matchDao()?.getMatchesByTeamName(teamName)?.collect { list ->
-                emit(list.map { it.toFootballMatch() })
-            }
-        }
+        return database?.matchDao()?.getMatchesByTeamName(teamName)
+            ?.map { list -> list.map { it.toFootballMatch() } }!!
     }
 
     override fun getMatchByNumber(number: Int): Flow<FootballMatch> {
-        return flow {
-            database?.matchDao()?.getMatchesByNumber(number)?.collect { it ->
-                emit(it.toFootballMatch())
-            }
-        }
+        return database?.matchDao()?.getMatchesByNumber(number)
+            ?.map { it.toFootballMatch() }!!
     }
 
     override fun saveMatches(list: List<FootballMatch>) {
-        database?.matchDao()?.clearTable()
-        database?.matchDao()?.insertAll(list.map { it.toMatchEntity()})
+        database?.matchDao()?.upsertAll(list.map { it.toMatchEntity() })
     }
 }

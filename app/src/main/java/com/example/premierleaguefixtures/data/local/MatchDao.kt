@@ -1,8 +1,8 @@
 package com.example.premierleaguefixtures.data.local
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -10,8 +10,8 @@ interface MatchDao {
     @Query("SELECT * FROM $MATCH_TABLE")
     fun getAll(): Flow<List<MatchEntity>>
 
-    @Insert
-    fun insertAll(users: List<MatchEntity>)
+    @Upsert
+    fun upsertAll(users: List<MatchEntity>)
 
     @Query("DELETE FROM $MATCH_TABLE")
     fun clearTable()

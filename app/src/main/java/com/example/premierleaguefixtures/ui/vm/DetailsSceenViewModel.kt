@@ -8,6 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,11 +23,9 @@ class DetailsScreenViewModel @Inject constructor(
     fun getMatch(): StateFlow<FootballMatch?> = _match
 
     fun getMatchByNumber(number: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            getMatchByNumberUseCase.execute(number).collect{
-                _match.emit(it)
-            }
-        }
+        getMatchByNumberUseCase.execute(number)
+            .onEach { _match.emit(it) }
+            .launchIn(viewModelScope)
     }
 
 }

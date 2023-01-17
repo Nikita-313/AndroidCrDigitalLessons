@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
 interface NetworkMatchesRepository {
-    fun getMatches(): Flow<Response<List<FootballMatch>>>
+    fun getMatches(): Flow<List<FootballMatch>>
 }

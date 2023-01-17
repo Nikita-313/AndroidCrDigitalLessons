@@ -1,7 +1,7 @@
 package com.example.premierleaguefixtures.di
 
 import com.example.premierleaguefixtures.data.local.MatchDatabase
-import com.example.premierleaguefixtures.data.network.MatchesService
+import com.example.premierleaguefixtures.data.network.service.MatchesService
 import com.example.premierleaguefixtures.data.repository.LocalMatchesRepositoryImpl
 import com.example.premierleaguefixtures.data.repository.NetworkMatchesRepositoryImpl
 import com.example.premierleaguefixtures.domain.repository.LocalMatchesRepository

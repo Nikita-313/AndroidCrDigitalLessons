@@ -8,9 +8,7 @@ import com.example.premierleaguefixtures.domain.usecase.LoadMatchesUseCase
 import com.example.premierleaguefixtures.domain.usecase.SearchMatchesByTeamNameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +21,8 @@ class MainScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _matches = MutableStateFlow(emptyList<FootballMatch>())
-    private val _isFetchingData = MutableStateFlow(true)
+    private val _isFetchingData = MutableStateFlow(false)
+    private val _isSearchingData = MutableStateFlow(false)
     private val _searchEditText = MutableStateFlow("")
     val searchEditText = _searchEditText.asStateFlow()
 
@@ -35,35 +34,34 @@ class MainScreenViewModel @Inject constructor(
     fun getMatches(): StateFlow<List<FootballMatch>> = _matches
     fun getIsFetchingData(): StateFlow<Boolean> = _isFetchingData
 
+    fun getIsSearchingData(): StateFlow<Boolean> = _isSearchingData
+    fun setIsSearchingData(b: Boolean){
+        _isSearchingData.value = b
+    }
+
     init {
         getLocalData()
         fetchServerData()
     }
 
     private fun getLocalData() {
-        viewModelScope.launch(Dispatchers.IO) {
-            getSavedMatchesUseCase.execute().collect{
-                _matches.emit(it)
-            }
-        }
+        getSavedMatchesUseCase.execute()
+            .onEach { _matches.emit(it) }
+            .launchIn(viewModelScope)
     }
 
     fun fetchServerData() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _isFetchingData.emit(true)
-            val list = loadMatchesUseCase.execute();
-            if(list.isNotEmpty())
-            _matches.emit(list)
-            _isFetchingData.emit(false)
-        }
+        loadMatchesUseCase.execute()
+            .onStart { _isFetchingData.emit(true) }
+            .onEach { _matches.emit(it) }
+            .onCompletion { _isFetchingData.emit(false) }
+            .launchIn(viewModelScope)
     }
 
     private fun searchMatchesByTeamName(teamName: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            searchMatchesByTeamNameUseCase.execute(teamName).collect{
-                _matches.emit(it)
-            }
-        }
+        searchMatchesByTeamNameUseCase.execute(teamName)
+            .onEach { _matches.emit(it) }
+            .launchIn(viewModelScope)
     }
 
 }

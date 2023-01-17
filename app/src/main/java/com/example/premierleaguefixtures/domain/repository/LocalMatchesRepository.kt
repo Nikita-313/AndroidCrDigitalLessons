@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocalMatchesRepository {
 
-    suspend fun getMatches(): Flow<List<FootballMatch>>
+    fun getMatches(): Flow<List<FootballMatch>>
 
     fun searchMatchesByTeamName(teamName: String):  Flow<List<FootballMatch>>
 

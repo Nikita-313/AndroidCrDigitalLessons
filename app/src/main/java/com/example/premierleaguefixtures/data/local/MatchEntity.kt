@@ -6,8 +6,7 @@ import com.example.premierleaguefixtures.domain.models.FootballMatch
 
 @Entity(tableName = MatchDao.MATCH_TABLE)
 data class MatchEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    @PrimaryKey
     val matchNumber: Int,
     val roundNumber: Int,
     val dateUtc: String,
@@ -35,7 +34,6 @@ fun MatchEntity.toFootballMatch() : FootballMatch {
 
 fun FootballMatch.toMatchEntity() : MatchEntity {
     return MatchEntity(
-        id = 0,
         matchNumber = matchNumber,
         roundNumber = roundNumber,
         dateUtc = dateUtc,

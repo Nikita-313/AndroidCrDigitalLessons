@@ -3,29 +3,37 @@ package com.example.premierleaguefixtures.ui.screens
 
 import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.premierleaguefixtures.ui.vm.MainScreenViewModel
 import com.example.premierleaguefixtures.R
+import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -37,58 +45,95 @@ fun MainScreen(viewModel: MainScreenViewModel = hiltViewModel(), navController: 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val matchesState by viewModel.getMatches().collectAsState()
     val isFetchingData by viewModel.getIsFetchingData().collectAsState()
-    var isShowSearch by remember { mutableStateOf(false) }
+    val isSearchingData by viewModel.getIsSearchingData().collectAsState()
     val searchEditText by viewModel.searchEditText.collectAsState()
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            Column {
-                TopAppBar(
-                    title = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "Matches 2021")
-                            Box(Modifier.width(5.dp))
-                            if (isFetchingData) {
-                                Text(text = "Fetching...")
+            if (isSearchingData)
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(),
+                    value = searchEditText,
+                    onValueChange = {
+                        coroutineScope.launch {
+                            if (listState.firstVisibleItemIndex != 0) {
+                                listState.animateScrollToItem(index = 0)
                             }
                         }
+                        viewModel.setSearchEditText(it)
                     },
-                    actions = {
-                        IconButton(
-                            onClick = viewModel::fetchServerData,
-                            enabled = !isFetchingData
-                        ) {
-                            Icon(Icons.Filled.Refresh, null)
-                        }
-                        IconButton(
-                            onClick = {
-                                isShowSearch = !isShowSearch
-                                viewModel.setSearchEditText("")
-                            },
-                            enabled = !isFetchingData
-                        ) {
-                            Icon(Icons.Filled.Search, null)
+                    placeholder = { Text(text = "Team name") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Search,
+                            null
+                        )
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            viewModel.setIsSearchingData(false)
+                            viewModel.setSearchEditText("")
+                            coroutineScope.launch {
+                                if (listState.firstVisibleItemIndex != 0) {
+                                    listState.animateScrollToItem(index = 0)
+                                }
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Rounded.Clear,
+                                null,
+                            )
                         }
                     },
-                    scrollBehavior = scrollBehavior
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                    ),
                 )
-                if (isFetchingData) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                if (isShowSearch)
-                    TextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        leadingIcon = { Icon(Icons.Filled.Search, null) },
-                        value = searchEditText,
-                        onValueChange = viewModel::setSearchEditText,
-                        label = { Text(text = "Team name") }
+            else
+                Column {
+                    TopAppBar(
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = "Matches 2021")
+                                Box(Modifier.width(5.dp))
+                                if (isFetchingData) {
+                                    Text(text = "Fetching...")
+                                }
+                            }
+                        },
+                        actions = {
+                            IconButton(
+                                onClick = viewModel::fetchServerData,
+                                enabled = !isFetchingData
+                            ) {
+                                Icon(Icons.Filled.Refresh, null)
+                            }
+                            IconButton(
+                                onClick = {
+                                    viewModel.setIsSearchingData(true)
+                                },
+                                enabled = !isFetchingData
+                            ) {
+                                Icon(Icons.Filled.Search, null)
+                            }
+                        },
+                        scrollBehavior = scrollBehavior
                     )
-            }
+                    if (isFetchingData) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
 
         },
     ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = it.calculateTopPadding())
+                .padding(top = it.calculateTopPadding()),
+            state = listState
         ) {
             items(matchesState.size) { i ->
                 InfoCard(
@@ -100,7 +145,6 @@ fun MainScreen(viewModel: MainScreenViewModel = hiltViewModel(), navController: 
                     matchesState[i].homeTeamScore,
                     matchesState[i].awayTeamScore,
                     navController = navController,
-                    isFetchingData
                 )
             }
         }
@@ -112,16 +156,15 @@ fun MainScreen(viewModel: MainScreenViewModel = hiltViewModel(), navController: 
 @Composable
 fun InfoCard(
     index: Int,
-    matchNumber:Int,
+    matchNumber: Int,
     dateTime: String,
     homeTeam: String,
     awayTeam: String,
     homeTeamScore: Int?,
     awayTeamScore: Int?,
     navController: NavController,
-    isFetchingData: Boolean,
 ) {
-    val cardColor = if (index % 2 == 0) Color(0xFFF7F8FA) else Color.White
+    val cardColor = if (index % 2 == 0) Color.White else Color(0xFFF7F8FA)
     val pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssz")
     val zonedDateTime = ZonedDateTime.parse(dateTime, pattern)
     val date = zonedDateTime.format(DateTimeFormatter.ofPattern("dd.MM")).toString()
@@ -131,8 +174,7 @@ fun InfoCard(
         colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(0.dp),
         onClick = {
-            if (!isFetchingData)
-            navController.navigate("details/$matchNumber")
+                navController.navigate("details/$matchNumber")
         }
     ) {
         Box {
