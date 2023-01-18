@@ -7,14 +7,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MatchDao {
-    @Query("SELECT * FROM $MATCH_TABLE")
-    fun getAll(): Flow<List<MatchEntity>>
 
     @Upsert
     fun upsertAll(users: List<MatchEntity>)
-
-    @Query("DELETE FROM $MATCH_TABLE")
-    fun clearTable()
 
     @Query("SELECT * FROM $MATCH_TABLE WHERE homeTeam LIKE '%' || :teamName ||'%' or awayTeam LIKE '%' || :teamName ||'%'")
     fun getMatchesByTeamName(teamName:String): Flow<List<MatchEntity>>

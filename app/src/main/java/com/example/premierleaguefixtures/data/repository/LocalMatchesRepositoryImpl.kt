@@ -13,11 +13,7 @@ class LocalMatchesRepositoryImpl @Inject constructor(
     private val database: MatchDatabase?
 ) : LocalMatchesRepository {
 
-    override fun getMatches(): Flow<List<FootballMatch>> {
-        return database?.matchDao()?.getAll()?.map { list -> list.map { it.toFootballMatch() } }!!
-    }
-
-    override fun searchMatchesByTeamName(teamName: String): Flow<List<FootballMatch>> {
+    override fun getMatchesByTeamName(teamName: String): Flow<List<FootballMatch>> {
         return database?.matchDao()?.getMatchesByTeamName(teamName)
             ?.map { list -> list.map { it.toFootballMatch() } }!!
     }

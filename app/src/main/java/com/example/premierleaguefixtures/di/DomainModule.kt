@@ -24,13 +24,8 @@ class DomainModule {
     }
 
     @Provides
-    fun  provideGetSavedMatchesUseCase(localMatchesRepository: LocalMatchesRepository) : GetSavedMatchesUseCase {
-        return GetSavedMatchesUseCase(localMatchesRepository = localMatchesRepository)
-    }
-
-    @Provides
-    fun  provideSearchMatchesByTeamNameUseCase(localMatchesRepository: LocalMatchesRepository) : SearchMatchesByTeamNameUseCase {
-        return SearchMatchesByTeamNameUseCase(localMatchesRepository = localMatchesRepository)
+    fun  provideSearchMatchesByTeamNameUseCase(localMatchesRepository: LocalMatchesRepository) : GetMatchesByTeamNameUseCase {
+        return GetMatchesByTeamNameUseCase(localMatchesRepository = localMatchesRepository)
     }
 
     @Provides

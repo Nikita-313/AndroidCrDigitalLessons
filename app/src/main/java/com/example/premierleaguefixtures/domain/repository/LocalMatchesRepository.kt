@@ -5,9 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocalMatchesRepository {
 
-    fun getMatches(): Flow<List<FootballMatch>>
-
-    fun searchMatchesByTeamName(teamName: String):  Flow<List<FootballMatch>>
+    fun getMatchesByTeamName(teamName: String):  Flow<List<FootballMatch>>
 
     fun getMatchByNumber(number: Int): Flow<FootballMatch>
 
