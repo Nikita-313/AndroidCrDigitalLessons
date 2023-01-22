@@ -22,7 +22,6 @@ class MainActivityCompose : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MatchDatabase.createDatabase(this)
         setContent {
             PremierLeagueFixturesTheme {
                 Surface(
