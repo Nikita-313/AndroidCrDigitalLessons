@@ -1,9 +1,9 @@
-package com.example.premierleaguefixtures.data.model
+package com.example.premierleaguefixtures.data.network.models
 
-import com.example.premierleaguefixtures.data.local.MatchEntity
+import com.example.premierleaguefixtures.domain.models.FootballMatch
 import com.google.gson.annotations.SerializedName
 
-data class Match(
+data class FootballMatchNetwork(
     @SerializedName("MatchNumber")
     val matchNumber: Int,
     @SerializedName("RoundNumber")
@@ -17,30 +17,15 @@ data class Match(
     @SerializedName("AwayTeam")
     val awayTeam: String,
     @SerializedName("Group")
-    val group: String?,
+    val group: String? = null,
     @SerializedName("HomeTeamScore")
     val homeTeamScore: Int = 0,
     @SerializedName("AwayTeamScore")
     val awayTeamScore: Int = 0
 )
 
-fun MatchEntity.toMatch() : Match {
-    return Match(
-        matchNumber = matchNumber,
-        roundNumber = roundNumber,
-        dateUtc = dateUtc,
-        location = location,
-        homeTeam = homeTeam,
-        awayTeam = awayTeam,
-        group = group,
-        homeTeamScore = homeTeamScore,
-        awayTeamScore = awayTeamScore
-    )
-}
-
-fun Match.toMatchEntity() : MatchEntity {
-    return MatchEntity(
-        id = 0,
+fun FootballMatchNetwork.toFootballMatch() : FootballMatch {
+    return FootballMatch(
         matchNumber = matchNumber,
         roundNumber = roundNumber,
         dateUtc = dateUtc,

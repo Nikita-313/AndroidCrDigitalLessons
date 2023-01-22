@@ -1,6 +1,8 @@
-package com.example.premierleaguefixtures.screens.MatchDetailsScreen
+package com.example.premierleaguefixtures.ui.screens
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,26 +21,34 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.premierleaguefixtures.ui.vm.DetailsScreenViewModel
 import com.example.premierleaguefixtures.R
+import com.example.premierleaguefixtures.domain.models.FootballMatch
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun MatchDetailsScreen() {
+fun MatchDetailsScreen(matchNumber: Int?, viewModel: DetailsScreenViewModel = hiltViewModel(), navController: NavController) {
+    if (matchNumber != null) {
+        viewModel.getMatchByNumber(matchNumber)
+    }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
+    val matchState by viewModel.getMatch().collectAsState()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
-                title = { Text(text = "Brenford vs Arsenal") },
+                title = { Text(text = matchState?.homeTeam + " vs " + matchState?.awayTeam) },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
                         Icon(imageVector = Icons.Default.Close, contentDescription = "")
                     }
                 },
@@ -49,25 +61,26 @@ fun MatchDetailsScreen() {
                     .fillMaxWidth()
                     .padding(top = it.calculateTopPadding())
             ) {
-                item { TopBar() }
-                item { InfoCard(tag = "Home team", logo = R.drawable.brentford, name = "Brenford") }
-                item { InfoCard(tag = "Away team", logo = R.drawable.arsenal, name = "Arsenal") }
+                item { TopBar(matchState) }
+                item { InfoCard(tag = "Home team", logo = R.drawable.home_team, name = matchState?.homeTeam.toString()) }
+                item { InfoCard(tag = "Away team", logo = R.drawable.away_team, name = matchState?.awayTeam.toString()) }
                 item {
                     InfoCard(
                         tag = "Location",
                         logo = R.drawable.stadium_icon,
-                        name = "Brentford communityy stadium"
+                        name = matchState?.location.toString()
                     )
                 }
-                item { InfoCard(tag = "Group", logo = R.drawable.group, name = "No") }
+                item { InfoCard(tag = "Group", logo = R.drawable.group, matchState?.group.toString()) }
                 item { Box(modifier = Modifier.height(10.dp)) }
             }
         }
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TopBar() {
+fun TopBar(matchState:FootballMatch?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -79,18 +92,19 @@ fun TopBar() {
             defaultElevation = 1.dp,
         ),
     ) {
+
         Text(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 20.dp),
-            text = "Round number: 1",
+            text = "Round number: " + matchState?.roundNumber.toString(),
             color = Color.Black,
             fontSize = 20.sp
         )
         Text(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally),
-            text = "19:00 13/08/2021",
+            text = matchState?.dateUtc.toString(),
             color = Color.Black,
             fontSize = 16.sp
         )
@@ -103,13 +117,13 @@ fun TopBar() {
             Surface(modifier = Modifier.weight(3f), color = Color.Black.copy(0.0f)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "2",
+                        text = matchState?.homeTeamScore.toString(),
                         color = Color.Black,
                         fontSize = 64.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Brentford",
+                        text = matchState?.homeTeam.toString(),
                         color = Color.Black,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.SemiBold
@@ -129,13 +143,13 @@ fun TopBar() {
             Surface(modifier = Modifier.weight(3f), color = Color.Black.copy(0.0f)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "0",
+                        text = matchState?.awayTeamScore.toString(),
                         color = Color.Black,
                         fontSize = 64.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Arsenal",
+                        text = matchState?.awayTeam.toString(),
                         color = Color.Black,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.SemiBold
